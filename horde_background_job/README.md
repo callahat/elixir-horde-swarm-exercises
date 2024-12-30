@@ -1,6 +1,14 @@
 # HordeBackgroundJob
 
-**TODO: Add description**
+```
+iex --sname nX -S mix
+
+# to kill the process
+HordeBackgroundJob.DatabaseCleaner.Starter.whereis |> GenServer.cast(:boom)
+
+# to see where the process is/get the PID
+HordeBackgroundJob.DatabaseCleaner.Starter.whereis
+```
 
 ## Installation
 
