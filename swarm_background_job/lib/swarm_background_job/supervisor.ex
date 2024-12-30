@@ -17,7 +17,7 @@ defmodule SwarmBackgroundJob.DatabaseCleaner.Supervisor do
     child_spec = %{
       id: SwarmBackgroundJob.DatabaseCleaner,
       start: {SwarmBackgroundJob.DatabaseCleaner, :start_link, [opts]},
-      restart: :transient,
+      restart: :temporary,
     }
 
     DynamicSupervisor.start_child(__MODULE__, child_spec)
