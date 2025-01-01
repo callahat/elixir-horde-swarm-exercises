@@ -30,27 +30,6 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
     {:noreply, timeout}
   end
 
-  @impl GenServer
-  def handle_info({:swarm, :die}, state) do
-    log_msg("recieved DIE")
-
-    {:stop, :shutdown, state}
-  end
-
-  @impl GenServer
-  def handle_call({:swarm, :begin_handoff}, from, state) do
-    log_msg("received handoff call from #{inspect from}")
-
-    {:reply, :restart, state}
-  end
-
-  @impl GenServer
-  def handle_cast({:swarm, :resolve_conflict, _}, state) do
-    log_msg("recieved resolve conflict cast")
-
-    {:noreply, state}
-  end
-
   defp schedule(timeout) do
     log_msg("scheduling")
 
