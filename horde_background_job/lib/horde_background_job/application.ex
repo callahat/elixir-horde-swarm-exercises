@@ -12,7 +12,12 @@ defmodule HordeBackgroundJob.Application do
       HordeBackgroundJob.HordeRegistry,
       HordeBackgroundJob.HordeSupervisor,
       HordeBackgroundJob.NodeObserver,
-      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: HordeBackgroundJob.DatabaseCleaner, timeout: :timer.seconds(2)]},
+      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: "Cleaner1", timeout: :timer.seconds(2)]},
+      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: "Cleaner2", timeout: :timer.seconds(2)]},
+      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: "Cleaner3", timeout: :timer.seconds(2)]},
+      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: "Cleaner4", timeout: :timer.seconds(2)]},
+      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: "Cleaner5", timeout: :timer.seconds(2)]},
+      {HordeBackgroundJob.DatabaseCleaner.Starter, [name: "Cleaner6", timeout: :timer.seconds(2)]},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

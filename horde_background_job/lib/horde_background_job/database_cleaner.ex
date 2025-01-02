@@ -8,26 +8,26 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
     name = Keyword.get(opts, :name, __MODULE__)
     timeout = Keyword.get(opts, :timeout, :timer.seconds(2))
 
-    GenServer.start_link(__MODULE__, timeout, name: name)
+    GenServer.start_link(__MODULE__, {timeout, name}, name: name)
   end
 
   @impl GenServer
-  def init(timeout) do
+  def init({timeout, name}) do
     log_msg("starting")
 
     schedule(timeout)
 
-    {:ok, timeout}
+    {:ok, {timeout, name}}
   end
 
   @impl GenServer
-  def handle_info(:execute, timeout) do
-    log_msg("deleting")
-    Task.start(Runner, :execute, [])
+  def handle_info(:execute, {timeout, name}) do
+    log_msg("deleting - #{ _name name }")
+    Task.start(Runner, :execute, [_name(name)])
 
     schedule(timeout)
 
-    {:noreply, timeout}
+    {:noreply, {timeout, name}}
   end
 
   defp schedule(timeout) do
@@ -35,5 +35,8 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
 
     Process.send_after(self(), :execute, timeout)
   end
+
+  defp _name({:via, Horde.Registry, {_, name}}), do: name
+  defp _name(name), do: name
 
 end

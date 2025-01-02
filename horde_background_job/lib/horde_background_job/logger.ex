@@ -4,7 +4,8 @@ defmodule HordeBackgroundJob.Logger do
       require Logger
 
       defp log_msg(msg) do
-        Logger.info("--- #{ node() } - #{ __MODULE__ } - #{ msg }")
+        mod_short_name = __MODULE__ |> to_string() |> String.split(".") |> List.last()
+        Logger.info("--- #{ node() } - #{ mod_short_name } - #{ msg }")
       end
     end
   end
