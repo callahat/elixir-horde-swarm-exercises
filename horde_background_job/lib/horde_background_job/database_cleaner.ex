@@ -14,9 +14,25 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
 
   @impl GenServer
   def init({timeout, name, count}) do
+    Process.set_label(_name(name))
+    polisher_name = "#{_name(name)}Polisher"
     log_msg("starting")
 
     schedule(timeout)
+
+    log_msg("starting horde super for the polisher - #{ inspect _name(name) }")
+    {:ok, polish_supervisor} = Horde.DynamicSupervisor.start_link([strategy: :one_for_one, name: :"#{polisher_name}"])
+    log_msg("should have started polish supervisor - #{ inspect polish_supervisor }")
+
+    child_spec = %{
+      id: polisher_name,
+      start: {HordeBackgroundJob.DatabasePolisher, :start_link, [[name: polisher_name, timeout: timeout]]},
+      type: :worker,
+      restart: :temporary,
+      shutdown: 500,
+    }
+
+    {:ok, _pid} = Horde.DynamicSupervisor.start_child(polish_supervisor, child_spec)
 
     {:ok, {timeout, name, count}}
   end

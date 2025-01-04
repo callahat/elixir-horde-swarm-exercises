@@ -2,7 +2,7 @@ defmodule HordeBackgroundJob.HordeSupervisor do
   use Horde.DynamicSupervisor
 
   def start_link(_) do
-    Horde.DynamicSupervisor.start_link(__MODULE__, [strategy: :one_for_one, distribution_strategy: Horde.UniformDistribution], name: __MODULE__)
+    Horde.DynamicSupervisor.start_link(__MODULE__, [strategy: :one_for_one], name: __MODULE__)
   end
 
   def init(init_arg) do
@@ -15,7 +15,15 @@ defmodule HordeBackgroundJob.HordeSupervisor do
     Horde.DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
+  def start_child(supervisor, child_spec) do
+    Horde.DynamicSupervisor.start_child(supervisor, child_spec)
+  end
+
   defp members() do
     Enum.map([Node.self() | Node.list()], &{__MODULE__, &1})
   end
+
+#  defp via_tuple(name) do
+#    {:via, Horde.Registry, {HordeRegistry, name}}
+#  end
 end
