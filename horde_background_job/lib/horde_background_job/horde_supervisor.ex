@@ -23,7 +23,4 @@ defmodule HordeBackgroundJob.HordeSupervisor do
     Enum.map([Node.self() | Node.list()], &{__MODULE__, &1})
   end
 
-#  defp via_tuple(name) do
-#    {:via, Horde.Registry, {HordeRegistry, name}}
-#  end
 end

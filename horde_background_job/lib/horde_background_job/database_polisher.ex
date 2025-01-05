@@ -10,7 +10,14 @@ defmodule HordeBackgroundJob.DatabasePolisher do
 
     log_msg("start_link polisher #{ inspect name}")
 
-    {:ok, _pid} = GenServer.start_link(__MODULE__, {timeout, name}, name: via_tuple(name))
+    case GenServer.start_link(__MODULE__, {timeout, name}, name: via_tuple(name)) do
+      {:ok, pid} ->
+        nil # nothing to do
+
+      {:error, {:already_started, pid}} ->
+        # also nothing to do but log it - mostly interested if a name is being set incorrectly
+        log_msg("already started at #{inspect(pid)} for #{ inspect(via_tuple(name)) }")
+    end
   end
 
   @impl GenServer
