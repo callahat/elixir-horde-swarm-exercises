@@ -3,6 +3,7 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
   use HordeBackgroundJob.Logger
 
   alias __MODULE__.Runner
+  alias HordeBackgroundJob.{HordeRegistry, HordeSupervisor}
 
   def start_link(opts) do
     name = Keyword.get(opts, :name, __MODULE__)
@@ -19,20 +20,6 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
     log_msg("starting")
 
     schedule(timeout)
-
-    log_msg("starting horde super for the polisher - #{ inspect _name(name) }")
-    {:ok, polish_supervisor} = Horde.DynamicSupervisor.start_link([strategy: :one_for_one, name: :"#{polisher_name}"])
-    log_msg("should have started polish supervisor - #{ inspect polish_supervisor }")
-
-    child_spec = %{
-      id: polisher_name,
-      start: {HordeBackgroundJob.DatabasePolisher, :start_link, [[name: polisher_name, timeout: timeout]]},
-      type: :worker,
-      restart: :temporary,
-      shutdown: 500,
-    }
-
-    {:ok, _pid} = Horde.DynamicSupervisor.start_child(polish_supervisor, child_spec)
 
     {:ok, {timeout, name, count}}
   end
@@ -56,4 +43,8 @@ defmodule HordeBackgroundJob.DatabaseCleaner do
   defp _name({:via, Horde.Registry, {_, name}}), do: name
   defp _name(name), do: name
 
+
+  defp _via_tuple(name) do
+    {:via, Horde.Registry, {HordeRegistry, name}}
+  end
 end

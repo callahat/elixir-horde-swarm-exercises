@@ -1,6 +1,7 @@
 defmodule HordeBackgroundJob.DatabaseCleaner.Starter do
   use HordeBackgroundJob.Logger
 
+  alias __MODULE__
   alias HordeBackgroundJob.{DatabaseCleaner, HordeRegistry, HordeSupervisor}
 
   def child_spec(opts) do
@@ -27,6 +28,25 @@ defmodule HordeBackgroundJob.DatabaseCleaner.Starter do
     }
 
     HordeSupervisor.start_child(child_spec)
+
+    # start a random number of index polishers
+    # these will simulate child processes that should die if the parent dies.
+    Enum.each(1..:rand.uniform(4), fn(i) ->
+      Starter.start_polisher(name, opts, i)
+    end )
+
+    :ignore
+  end
+
+  def start_polisher(parent, opts, idx) do
+    polisher_name = "#{Keyword.get(opts,:name, DatabaseCleaner)}Polisher#{idx}"
+
+    child_spec = %{
+      id: polisher_name,
+      start: {HordeBackgroundJob.DatabasePolisher, :start_link, [[name: polisher_name, timeout: 2_000, parent: parent]]},
+    }
+
+    IO.inspect HordeSupervisor.start_child(child_spec)
 
     :ignore
   end
